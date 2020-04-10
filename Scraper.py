@@ -1,15 +1,15 @@
 from bs4 import BeautifulSoup
+import csv
 import requests
-
-link='https://store.steampowered.com/app/271590/Grand_Theft_Auto_V/'
+from collections import Counter
 
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36"}
 cookies = {'birthtime': '568022401'}
 
-
 class Game:
     def __init__(self, _storeLink, _intrested):
-        self.intrested = _intrested # will always be defined by me
+        self.intrested = True if int(_intrested) == 1 else False
+
 
         page = requests.get(_storeLink, headers=headers, cookies=cookies) #opens the link to the user's Steam game
         soup = BeautifulSoup(page.content, "lxml") # parses it so that we can extract what we need
@@ -27,7 +27,6 @@ class Game:
             self.tags[len(self.tags) - 1] = self.tags[len(self.tags) - 1][:-1] #removes the plus sign from the back of the last element
 
         reviewBlock = soup.find_all('div', class_='user_reviews_summary_row')
-        print(len(reviewBlock))
         if len(reviewBlock) == 2:
             # Game has both Recent and All reviews
             try:
@@ -68,12 +67,40 @@ class Game:
 
     def printVals(self):
         print('\n\nName:', self.name)
+        print('\nIntrested: Yes' if self.intrested else '\nIntrested: No')
         print('\nDescription:', self.description)
         print('\nRecent Reviews:', self.recentReviewStatus, self.recentReviewCount, '\nAll Reviews:', self.allReviewStatus, self.allReviewCount)
         print('\nTags:', self.tags)
         print('\nRatings:', self.ratings)
         print('\nDevelopers:', self.developers)
         print('\nPublishers:', self.publishers)
+
+
+def PrepData():
+    # Name, Description, 
+    print('prep')
+
+def CombineListsToDict(_listOfLists):
+    combinedLists = []
+
+    for list in _listOfLists:
+        combinedLists.extend(list)
+    
+    mostCommonElements = dict(Counter(combinedLists).most_common())
+    
+    counter = 0
+    flippedInOrderDict = {}
+    for element in mostCommonElements:
+        flippedInOrderDict[counter] = element
+        counter = counter + 1
+    return flippedInOrderDict
+
+
+
+
+
+
+
+  
+    
         
-x = Game(link, True)
-x.printVals()
